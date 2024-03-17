@@ -53,24 +53,28 @@ func (r *GatewayRequest) signed(terminalKey string) (string, error) {
 
 // Request 收银吧网关支付 WAP支付收银台
 // https://doc.shouqianba.com/zh-cn/api/wap2.html
-func (s *GatewayService) Request(ctx context.Context, opts *GatewayRequest) (*http.Response, error) {
+func (s *GatewayService) Request(ctx context.Context, req *GatewayRequest) (*http.Response, error) {
+	req.TerminalSN = s.client.config.TerminalSN
+
+	if s.client.config.NotifyURL != "" {
+		req.NotifyURL = s.client.config.NotifyURL
+	}
+	if s.client.config.ReturnURL != "" {
+		req.ReturnURL = s.client.config.ReturnURL
+	}
+
 	u, err := url.Parse(apiGatewayBaseURL)
 	if err != nil {
 		return nil, err
 	}
 
-	sv, err := opts.signed(s.client.config.TerminalKey)
+	sv, err := req.signed(s.client.config.TerminalKey)
 	if err != nil {
 		return nil, err
 	}
 	u.RawQuery = sv
 
-	req, err := s.client.NewRequest(http.MethodGet, u.String(), nil, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.Do(ctx, req, nil)
+	resp, err := s.client.Request(ctx, http.MethodGet, u.String(), nil, nil)
 	if err != nil {
 		return resp, err
 	}

@@ -31,6 +31,8 @@ type Config struct {
 	VendorKey   string
 	TerminalSN  string
 	TerminalKey string
+	ReturnURL   string
+	NotifyURL   string
 }
 
 type ClientOptionFunc func(config *Config)
@@ -92,12 +94,20 @@ func WithAuthentication(auth string) RequestOption {
 	}
 }
 
+func (c *Client) Request(ctx context.Context, method, url string, body, v interface{}, opts ...RequestOption) (*http.Response, error) {
+	req, err := c.NewRequest(ctx, method, url, body, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(ctx, req, v)
+}
+
 // NewRequest creates an API request. A relative URL can be provided in urlStr,
 // in which case it is resolved relative to the BaseURL of the Client.
 // Relative URLs should always be specified without a preceding slash. If
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
-func (c *Client) NewRequest(method, url string, body interface{}, opts ...RequestOption) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method, url string, body interface{}, opts ...RequestOption) (*http.Request, error) {
 	var buf io.ReadWriter
 	if body != nil {
 		bs, err := json.Marshal(body)
@@ -107,7 +117,7 @@ func (c *Client) NewRequest(method, url string, body interface{}, opts ...Reques
 		buf = bytes.NewBuffer(bs)
 	}
 
-	req, err := http.NewRequest(method, url, buf)
+	req, err := http.NewRequestWithContext(ctx, method, url, buf)
 
 	if err != nil {
 		return nil, err

@@ -37,28 +37,22 @@ type TerminalActivateRequest struct {
 func (s *TerminalService) Activate(ctx context.Context) (*TerminalResponse, *http.Response, error) {
 	u := baseURL + "/terminal/activate"
 
-	opts := &TerminalActivateRequest{
+	req := &TerminalActivateRequest{
 		AppID:    s.client.config.AppID,
 		Code:     s.client.config.Code,
 		DeviceID: s.client.config.DeviceID,
 	}
 
-	signed, err := sign(opts, s.client.config.VendorSN, s.client.config.VendorKey)
+	signed, err := sign(req, s.client.config.VendorSN, s.client.config.VendorKey)
 	if err != nil {
 		return nil, nil, fmt.Errorf("md5: activate terminal sign error : %v", err)
 	}
 
-	req, err := s.client.NewRequest(http.MethodPost, u, opts, WithAuthentication(signed))
-	if err != nil {
-		return nil, nil, err
-	}
-
 	result := new(TerminalResponse)
-	resp, err := s.client.Do(ctx, req, result)
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
 	if err != nil {
 		return nil, resp, err
 	}
-
 	return result, resp, nil
 }
 
@@ -74,24 +68,19 @@ type TerminalCheckInRequest struct {
 func (s *TerminalService) CheckIn(ctx context.Context) (*TerminalResponse, *http.Response, error) {
 	u := baseURL + "/terminal/checkin"
 
-	opts := &TerminalCheckInRequest{
+	req := &TerminalCheckInRequest{
 		DeviceID:   s.client.config.DeviceID,
 		TerminalSn: s.client.config.TerminalSN,
 	}
 
-	signed, err := sign(opts, s.client.config.TerminalSN, s.client.config.TerminalKey)
+	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
 
 	if err != nil {
 		return nil, nil, fmt.Errorf("md5: checkin terminal sign error : %v", err)
 	}
 
-	req, err := s.client.NewRequest(http.MethodPost, u, opts, WithAuthentication(signed))
-	if err != nil {
-		return nil, nil, err
-	}
-
 	result := new(TerminalResponse)
-	resp, err := s.client.Do(ctx, req, result)
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
 	if err != nil {
 		return nil, resp, err
 	}

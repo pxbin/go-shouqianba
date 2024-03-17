@@ -8,8 +8,8 @@ type (
 	// JSONTime overrides MarshalJson method to format in ISO8601
 	JSONTime time.Time
 
-	// PaymentResponse is the response from Shouqianba base biz response API
-	PaymentResponse struct {
+	// ApiResponse is the response from Shouqianba base biz response API
+	ApiResponse struct {
 		ResultCode  string      `json:"result_code"`
 		ErrCode     string      `json:"error_code,omitempty"`
 		ErrMessage  string      `json:"error_message,omitempty"`
@@ -35,8 +35,8 @@ type (
 		PayLogin          string `json:"pay_login,omitempty"`
 		TradeNo           string `json:"trade_no,omitempty"`
 		QrCode            string `json:"qr_code,omitempty"`
-		TotalAmount       string `json:"total_amount,omitempty"`
-		NetAmount         string `json:"net_amount,omitempty"`
+		TotalAmount       int64  `json:"total_amount,omitempty"`
+		NetAmount         int64  `json:"net_amount,omitempty"`
 		Payway            string `json:"payway,omitempty"`
 		SubPayway         string `json:"sub_payway,omitempty"`
 		FinishTime        string `json:"finish_time,omitempty"`
@@ -52,7 +52,7 @@ type (
 
 	// GoodDetail represents the goods detail for payment
 	GoodDetail struct {
-		GoodsID       string `json:"goods_id"`       // 商品ID
+		GoodsId       string `json:"goods_id"`       // 商品ID
 		GoodsName     string `json:"goods_name"`     // 商品名称
 		Price         int    `json:"price"`          // 商品单价
 		Quantity      int    `json:"quantity"`       // 商品数量
