@@ -37,8 +37,8 @@ type PreCreateRequest struct {
 func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/pay"
 	req.TerminalSN = s.client.config.TerminalSN
-	req.Subject = s.client.config.subject
-	req.Operator = s.client.config.operator
+	req.Subject = s.client.config.Subject
+	req.Operator = s.client.config.Operator
 
 	if s.client.config.NotifyURL != "" {
 		req.NotifyURL = s.client.config.NotifyURL
@@ -64,8 +64,8 @@ func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest, opts .
 func (s *UPayService) Precreate(ctx context.Context, req *PreCreateRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/precreate"
 	req.TerminalSN = s.client.config.TerminalSN
-	req.Subject = s.client.config.subject
-	req.Operator = s.client.config.operator
+	req.Subject = s.client.config.Subject
+	req.Operator = s.client.config.Operator
 
 	if s.client.config.NotifyURL != "" {
 		req.NotifyURL = s.client.config.NotifyURL
@@ -103,7 +103,7 @@ type UPayRefundRequest struct {
 func (s *UPayService) Refund(ctx context.Context, req *UPayRefundRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/refund"
 	req.TerminalSN = s.client.config.TerminalSN
-	req.Operator = s.client.config.operator
+	req.Operator = s.client.config.Operator
 
 	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
 	if err != nil {

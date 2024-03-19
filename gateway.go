@@ -39,8 +39,8 @@ type GatewayRequest struct {
 // https://doc.shouqianba.com/zh-cn/api/wap2.html
 func (s *GatewayService) GetWapURL(ctx context.Context, req *GatewayRequest) (string, error) {
 	req.TerminalSN = s.client.config.TerminalSN
-	req.Subject = s.client.config.subject
-	req.Operator = s.client.config.operator
+	req.Subject = s.client.config.Subject
+	req.Operator = s.client.config.Operator
 
 	if s.client.config.NotifyURL != "" {
 		req.NotifyURL = s.client.config.NotifyURL

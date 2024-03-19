@@ -33,21 +33,21 @@ type Config struct {
 	TerminalKey string
 	ReturnURL   string
 	NotifyURL   string
-	subject     string
-	operator    string
+	Subject     string
+	Operator    string
 }
 
 type ClientOptionFunc func(config *Config)
 
 func WithSubject(subject string) ClientOptionFunc {
 	return func(config *Config) {
-		config.subject = subject
+		config.Subject = subject
 	}
 }
 
 func WithOperator(operator string) ClientOptionFunc {
 	return func(config *Config) {
-		config.operator = operator
+		config.Operator = operator
 	}
 }
 
