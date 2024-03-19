@@ -34,9 +34,11 @@ type PreCreateRequest struct {
 
 // Payment 收钱吧支付接口
 // https://doc.shouqianba.com/zh-cn/api/interface/pay.html
-func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest) (*ApiResponse, *http.Response, error) {
+func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/pay"
 	req.TerminalSN = s.client.config.TerminalSN
+	req.Subject = s.client.config.subject
+	req.Operator = s.client.config.operator
 
 	if s.client.config.NotifyURL != "" {
 		req.NotifyURL = s.client.config.NotifyURL
@@ -46,9 +48,10 @@ func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest) (*ApiR
 	if err != nil {
 		return nil, nil, err
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -58,9 +61,12 @@ func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest) (*ApiR
 
 // Precreate 收钱吧预下单接口
 // https://doc.shouqianba.com/zh-cn/api/interface/precreate.html
-func (s *UPayService) Precreate(ctx context.Context, req *PreCreateRequest) (*ApiResponse, *http.Response, error) {
+func (s *UPayService) Precreate(ctx context.Context, req *PreCreateRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/precreate"
 	req.TerminalSN = s.client.config.TerminalSN
+	req.Subject = s.client.config.subject
+	req.Operator = s.client.config.operator
+
 	if s.client.config.NotifyURL != "" {
 		req.NotifyURL = s.client.config.NotifyURL
 	}
@@ -69,9 +75,10 @@ func (s *UPayService) Precreate(ctx context.Context, req *PreCreateRequest) (*Ap
 	if err != nil {
 		return nil, nil, err
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -93,17 +100,19 @@ type UPayRefundRequest struct {
 
 // Refund 收钱吧退款接口
 // https://doc.shouqianba.com/zh-cn/api/interface/refund.html
-func (s *UPayService) Refund(ctx context.Context, req *UPayRefundRequest) (*ApiResponse, *http.Response, error) {
+func (s *UPayService) Refund(ctx context.Context, req *UPayRefundRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/refund"
 	req.TerminalSN = s.client.config.TerminalSN
+	req.Operator = s.client.config.operator
 
 	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
 	if err != nil {
 		return nil, nil, err
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -120,7 +129,7 @@ type UPayQueryRequest struct {
 
 // Query 收钱吧查询接口
 // https://doc.shouqianba.com/zh-cn/api/interface/query.html
-func (s *UPayService) Query(ctx context.Context, req *UPayQueryRequest) (*ApiResponse, *http.Response, error) {
+func (s *UPayService) Query(ctx context.Context, req *UPayQueryRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/query"
 	req.TerminalSN = s.client.config.TerminalSN
 
@@ -128,9 +137,10 @@ func (s *UPayService) Query(ctx context.Context, req *UPayQueryRequest) (*ApiRes
 	if err != nil {
 		return nil, nil, err
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -146,7 +156,7 @@ type UPayCancelRequest struct {
 
 // Cancel 收钱吧撤销接口
 // https://doc.shouqianba.com/zh-cn/api/interface/revoke&cancel.html
-func (s *UPayService) Cancel(ctx context.Context, req *UPayCancelRequest) (*ApiResponse, *http.Response, error) {
+func (s *UPayService) Cancel(ctx context.Context, req *UPayCancelRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/cancel"
 	req.TerminalSN = s.client.config.TerminalSN
 
@@ -154,9 +164,10 @@ func (s *UPayService) Cancel(ctx context.Context, req *UPayCancelRequest) (*ApiR
 	if err != nil {
 		return nil, nil, err
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}

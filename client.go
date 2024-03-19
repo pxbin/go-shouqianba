@@ -33,9 +33,23 @@ type Config struct {
 	TerminalKey string
 	ReturnURL   string
 	NotifyURL   string
+	subject     string
+	operator    string
 }
 
 type ClientOptionFunc func(config *Config)
+
+func WithSubject(subject string) ClientOptionFunc {
+	return func(config *Config) {
+		config.subject = subject
+	}
+}
+
+func WithOperator(operator string) ClientOptionFunc {
+	return func(config *Config) {
+		config.operator = operator
+	}
+}
 
 // Client mrepresents a Shouqianba REST API Client
 type Client struct {
@@ -94,8 +108,15 @@ func WithAuthentication(auth string) RequestOption {
 	}
 }
 
+// WithClientIP sets the request's X-Forwarded-For header to the provided value.
+func WithClientIP(realIP string) RequestOption {
+	return func(req *http.Request) {
+		req.Header.Set("X-Forwarded-For", realIP)
+	}
+}
+
 func (c *Client) Request(ctx context.Context, method, url string, body, v interface{}, opts ...RequestOption) (*http.Response, error) {
-	req, err := c.NewRequest(ctx, method, url, body, opts...)
+	req, err := c.newRequest(ctx, method, url, body, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +128,7 @@ func (c *Client) Request(ctx context.Context, method, url string, body, v interf
 // Relative URLs should always be specified without a preceding slash. If
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
-func (c *Client) NewRequest(ctx context.Context, method, url string, body interface{}, opts ...RequestOption) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, method, url string, body interface{}, opts ...RequestOption) (*http.Request, error) {
 	var buf io.ReadWriter
 	if body != nil {
 		bs, err := json.Marshal(body)

@@ -34,7 +34,7 @@ type TerminalActivateRequest struct {
 
 // Activate 收钱吧终端激活接口
 // https://doc.shouqianba.com/zh-cn/api/interface/activate.html
-func (s *TerminalService) Activate(ctx context.Context) (*TerminalResponse, *http.Response, error) {
+func (s *TerminalService) Activate(ctx context.Context, opts ...RequestOption) (*TerminalResponse, *http.Response, error) {
 	u := baseURL + "/terminal/activate"
 
 	req := &TerminalActivateRequest{
@@ -47,9 +47,10 @@ func (s *TerminalService) Activate(ctx context.Context) (*TerminalResponse, *htt
 	if err != nil {
 		return nil, nil, fmt.Errorf("md5: activate terminal sign error : %v", err)
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(TerminalResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -65,7 +66,7 @@ type TerminalCheckInRequest struct {
 
 // CheckIn 收钱吧终端签到接口
 // https://doc.shouqianba.com/zh-cn/api/interface/checkin.html
-func (s *TerminalService) CheckIn(ctx context.Context) (*TerminalResponse, *http.Response, error) {
+func (s *TerminalService) CheckIn(ctx context.Context, opts ...RequestOption) (*TerminalResponse, *http.Response, error) {
 	u := baseURL + "/terminal/checkin"
 
 	req := &TerminalCheckInRequest{
@@ -78,9 +79,10 @@ func (s *TerminalService) CheckIn(ctx context.Context) (*TerminalResponse, *http
 	if err != nil {
 		return nil, nil, fmt.Errorf("md5: checkin terminal sign error : %v", err)
 	}
+	opts = append(opts, WithAuthentication(signed))
 
 	result := new(TerminalResponse)
-	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, WithAuthentication(signed))
+	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
 		return nil, resp, err
 	}
