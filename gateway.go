@@ -45,7 +45,8 @@ func (s *GatewayService) GetWapURL(ctx context.Context, req *GatewayRequest) (st
 	if s.client.config.NotifyURL != "" {
 		req.NotifyURL = s.client.config.NotifyURL
 	}
-	params := map[string]string{}
+
+	params := map[string]interface{}{}
 	mapstructure.Decode(req, &params)
 
 	q := encode(params)
@@ -56,7 +57,7 @@ func (s *GatewayService) GetWapURL(ctx context.Context, req *GatewayRequest) (st
 	return fmt.Sprintf("%s?%s&sign=%s", apiGatewayBaseURL, q, signed), nil
 }
 
-func encode(v map[string]string) string {
+func encode(v map[string]interface{}) string {
 	if len(v) == 0 {
 		return ""
 	}
@@ -73,7 +74,7 @@ func encode(v map[string]string) string {
 		}
 		buf.WriteString(k)
 		buf.WriteByte('=')
-		buf.WriteString(v)
+		buf.WriteString(fmt.Sprintf("%v", v))
 	}
 	return buf.String()
 }
