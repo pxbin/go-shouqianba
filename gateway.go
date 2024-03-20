@@ -21,7 +21,7 @@ type GatewayRequest struct {
 	// AppID 收钱吧分配的APPID
 	TerminalSN   string `mapstructure:"terminal_sn" json:"terminal_sn"`                         // 收钱吧终端ID
 	ClientSN     string `mapstructure:"client_sn" json:"client_sn"`                             // 商户系统订单号
-	TotalAmount  string `mapstructure:"total_amount" json:"total_amount"`                       // 订单总金额
+	TotalAmount  int64  `mapstructure:"total_amount" json:"total_amount"`                       // 订单总金额
 	Subject      string `mapstructure:"subject" json:"subject"`                                 // 交易概述
 	Payway       string `mapstructure:"payway,omitempty" json:"payway,omitempty"`               // 支付方式
 	Operator     string `mapstructure:"operator" json:"operator,omitempty"`                     // 门店操作员
