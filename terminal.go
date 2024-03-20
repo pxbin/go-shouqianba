@@ -2,7 +2,6 @@ package shouqianba
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 )
 
@@ -20,6 +19,11 @@ type TerminalResponse struct {
 	ResultCode string `json:"result_code"`
 	ErrCode    string `json:"error_code,omitempty"`
 	ErrMessage string `json:"error_message,omitempty"`
+}
+
+type Terminal struct {
+	TerminalSN  string `json:"terminal_sn"`
+	TerminalKey string `json:"terminal_key"`
 }
 
 type TerminalActivateRequest struct {
@@ -42,12 +46,6 @@ func (s *TerminalService) Activate(ctx context.Context, opts ...RequestOption) (
 		Code:     s.client.config.Code,
 		DeviceID: s.client.config.DeviceID,
 	}
-
-	signed, err := sign(req, s.client.config.VendorSN, s.client.config.VendorKey)
-	if err != nil {
-		return nil, nil, fmt.Errorf("md5: activate terminal sign error : %v", err)
-	}
-	opts = append(opts, WithAuthentication(signed))
 
 	result := new(TerminalResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
@@ -73,13 +71,6 @@ func (s *TerminalService) CheckIn(ctx context.Context, opts ...RequestOption) (*
 		DeviceID:   s.client.config.DeviceID,
 		TerminalSn: s.client.config.TerminalSN,
 	}
-
-	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
-
-	if err != nil {
-		return nil, nil, fmt.Errorf("md5: checkin terminal sign error : %v", err)
-	}
-	opts = append(opts, WithAuthentication(signed))
 
 	result := new(TerminalResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)

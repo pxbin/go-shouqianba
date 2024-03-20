@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -116,7 +117,7 @@ func WithClientIP(realIP string) RequestOption {
 }
 
 func (c *Client) Request(ctx context.Context, method, url string, body, v interface{}, opts ...RequestOption) (*http.Response, error) {
-	req, err := c.newRequest(ctx, method, url, body, opts...)
+	req, err := c.NewRequest(ctx, method, url, body, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,13 +129,18 @@ func (c *Client) Request(ctx context.Context, method, url string, body, v interf
 // Relative URLs should always be specified without a preceding slash. If
 // specified, the value pointed to by body is JSON encoded and included as the
 // request body.
-func (c *Client) newRequest(ctx context.Context, method, url string, body interface{}, opts ...RequestOption) (*http.Request, error) {
-	var buf io.ReadWriter
+func (c *Client) NewRequest(ctx context.Context, method, url string, body interface{}, opts ...RequestOption) (*http.Request, error) {
+	var (
+		buf     io.ReadWriter
+		signstr string
+	)
+
 	if body != nil {
 		bs, err := json.Marshal(body)
 		if err != nil {
 			return nil, err
 		}
+		signstr = string(bs)
 		buf = bytes.NewBuffer(bs)
 	}
 
@@ -145,6 +151,11 @@ func (c *Client) newRequest(ctx context.Context, method, url string, body interf
 	}
 
 	req.Header.Set(headerContentTypeKey, jsonContentType)
+
+	if strings.Contains(url, "/terminal/activate") {
+		req.Header.Set(headerAuthorizationKey, c.sign(signstr, c.config.VendorSN, c.config.VendorKey))
+	}
+	req.Header.Set(headerAuthorizationKey, c.sign(signstr, c.config.TerminalSN, c.config.TerminalKey))
 
 	for _, opt := range opts {
 		opt(req)
@@ -195,12 +206,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*htt
 	return resp, err
 }
 
-func sign(req interface{}, sn, key string) (string, error) {
-	bs, err := json.Marshal(req)
-	if err != nil {
-		return "", err
-	}
-	signstr := string(bs) + key
-	sum := md5.Sum([]byte(signstr))
-	return sn + " " + hex.EncodeToString(sum[:]), nil
+func (c *Client) sign(str, sn, key string) string {
+	sum := md5.Sum([]byte(str + key))
+	return sn + " " + hex.EncodeToString(sum[:])
 }

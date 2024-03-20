@@ -15,7 +15,7 @@ type UPayService service
 type PreCreateRequest struct {
 	TerminalSN   string       `json:"terminal_sn"`             // 收钱吧终端ID 	不超过32位的纯数字
 	ClientSN     string       `json:"client_sn"`               // 商户系统订单号,必须在商户系统内唯一；且长度不超过32字节
-	TotalAmount  string       `json:"total_amount"`            // 交易总金额,以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
+	TotalAmount  int64        `json:"total_amount,string"`     // 交易总金额,以分为单位,不超过10位纯数字字符串,超过1亿元的收款请使用银行转账
 	Payway       string       `json:"payway,omitempty"`        // 支付方式
 	SubPayway    string       `json:"sub_payway,omitempty"`    // 二级支付方式 内容为数字的字符串，如果要使用WAP支付，则必须传 "3"；使用小程序支付，则必须传"4"
 	PayerUID     string       `json:"payer_uid,omitempty"`     // 付款人id 消费者在支付通道的唯一id，wap支付，小程序支付必传 ，微信WAP支付必须传open_id,支付宝WAP支付必传用户授权的userId
@@ -44,12 +44,6 @@ func (s *UPayService) Payment(ctx context.Context, req *PreCreateRequest, opts .
 		req.NotifyURL = s.client.config.NotifyURL
 	}
 
-	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
-	if err != nil {
-		return nil, nil, err
-	}
-	opts = append(opts, WithAuthentication(signed))
-
 	result := new(ApiResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
@@ -71,12 +65,6 @@ func (s *UPayService) Precreate(ctx context.Context, req *PreCreateRequest, opts
 		req.NotifyURL = s.client.config.NotifyURL
 	}
 
-	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
-	if err != nil {
-		return nil, nil, err
-	}
-	opts = append(opts, WithAuthentication(signed))
-
 	result := new(ApiResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
@@ -92,7 +80,7 @@ type UPayRefundRequest struct {
 	ClientSN        string       `json:"client_sn,omitempty"`         // 商户自己的订单号
 	RefundRequestNo string       `json:"refund_request_no,omitempty"` // 退款序列号
 	Operator        string       `json:"operator,omitempty"`          // 门店操作员
-	RefundAmount    string       `json:"refund_amount"`               // 退款金额
+	RefundAmount    int64        `json:"refund_amount,string"`        // 退款金额
 	Extended        interface{}  `json:"extended,omitempty"`          // 扩展参数集合
 	GoodDetails     []GoodDetail `json:"goods_details,omitempty"`     // 商品详情
 	Reflect         string       `json:"reflect,omitempty"`           // 业务反射参数
@@ -104,12 +92,6 @@ func (s *UPayService) Refund(ctx context.Context, req *UPayRefundRequest, opts .
 	u := baseURL + "/upay/v2/refund"
 	req.TerminalSN = s.client.config.TerminalSN
 	req.Operator = s.client.config.Operator
-
-	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
-	if err != nil {
-		return nil, nil, err
-	}
-	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
@@ -133,12 +115,6 @@ func (s *UPayService) Query(ctx context.Context, req *UPayQueryRequest, opts ...
 	u := baseURL + "/upay/v2/query"
 	req.TerminalSN = s.client.config.TerminalSN
 
-	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
-	if err != nil {
-		return nil, nil, err
-	}
-	opts = append(opts, WithAuthentication(signed))
-
 	result := new(ApiResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)
 	if err != nil {
@@ -159,12 +135,6 @@ type UPayCancelRequest struct {
 func (s *UPayService) Cancel(ctx context.Context, req *UPayCancelRequest, opts ...RequestOption) (*ApiResponse, *http.Response, error) {
 	u := baseURL + "/upay/v2/cancel"
 	req.TerminalSN = s.client.config.TerminalSN
-
-	signed, err := sign(req, s.client.config.TerminalSN, s.client.config.TerminalKey)
-	if err != nil {
-		return nil, nil, err
-	}
-	opts = append(opts, WithAuthentication(signed))
 
 	result := new(ApiResponse)
 	resp, err := s.client.Request(ctx, http.MethodPost, u, req, result, opts...)

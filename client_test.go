@@ -55,7 +55,7 @@ func Test_UPayPrecreate(t *testing.T) {
 	req := &PreCreateRequest{
 		TerminalSN:  config.TerminalSN,
 		ClientSN:    "e10adc3949ba59abbe56e057f20f883e",
-		TotalAmount: "100",
+		TotalAmount: 100,
 		Payway:      "3",
 		Subject:     "测试",
 		Operator:    "Obama",
@@ -74,4 +74,14 @@ func Test_UPayPrecreate(t *testing.T) {
 func pprint(t *testing.T, v interface{}) {
 	bs, _ := json.Marshal(v)
 	t.Logf(string(bs))
+}
+
+func TestTimestamp(t *testing.T) {
+	milliseconds := "17108440250350001"
+
+	var got Timestamp
+
+	json.Unmarshal([]byte(milliseconds), &got)
+
+	t.Log(got)
 }
