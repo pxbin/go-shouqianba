@@ -1,7 +1,9 @@
 package shouqianba
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -23,7 +25,8 @@ func (t *Timestamp) GetTime() *time.Time {
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Timestamp) UnmarshalJSON(data []byte) error {
-	millis, err := strconv.ParseInt(string(data), 10, 64)
+	fmt.Println("Timestamp UnmarshalJSON:", data)
+	millis, err := strconv.ParseInt(strings.Trim(string(data), "\""), 10, 64)
 	if err != nil {
 		return err
 	}
