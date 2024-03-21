@@ -34,8 +34,8 @@ type (
 		Payway            string `json:"payway,omitempty"`
 		PaywayName        string `json:"payway_name,omitempty"`
 		SubPayway         string `json:"sub_payway,omitempty"`
-		FinishTime        *int64 `json:"finish_time,omitempty"`
-		ChannelFinishTime *int64 `json:"channel_finish_time,omitempty"`
+		FinishTime        *int64 `json:"finish_time,string,omitempty"`
+		ChannelFinishTime *int64 `json:"channel_finish_time,string,omitempty"`
 		StoreID           string `json:"store_id,omitempty"`
 		Subject           string `json:"subject,omitempty"`
 		Description       string `json:"description,omitempty"`
