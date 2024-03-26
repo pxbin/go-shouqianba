@@ -24,7 +24,12 @@ func (t *Timestamp) GetTime() *time.Time {
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Timestamp) UnmarshalJSON(data []byte) error {
-	millis, err := strconv.ParseInt(strings.Trim(string(data), "\""), 10, 64)
+	str := strings.Trim(string(data), "\"")
+	if str == "" {
+		return nil
+	}
+
+	millis, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		return err
 	}
