@@ -154,8 +154,9 @@ func (c *Client) NewRequest(ctx context.Context, method, url string, body interf
 
 	if strings.Contains(url, "/terminal/activate") {
 		req.Header.Set(headerAuthorizationKey, c.sign(signstr, c.config.VendorSN, c.config.VendorKey))
+	} else {
+		req.Header.Set(headerAuthorizationKey, c.sign(signstr, c.config.TerminalSN, c.config.TerminalKey))
 	}
-	req.Header.Set(headerAuthorizationKey, c.sign(signstr, c.config.TerminalSN, c.config.TerminalKey))
 
 	for _, opt := range opts {
 		opt(req)
